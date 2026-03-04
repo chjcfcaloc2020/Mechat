@@ -8,6 +8,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: false,
 
+  setAccessToken: (accessToken) => {
+    set({ accessToken })
+  },
+
   clearState: () => {
     set({ accessToken: null, user: null, loading: false })
   },
@@ -31,11 +35,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: true })
       // call api
       const { accessToken } = await authService.signIn(username, password)
-      set({ accessToken })
+      get().setAccessToken(accessToken)
 
       // get user data
       await get().fetchMe()
-      
+
       toast.success("Chào mừng bạn quay lại với Mechat👋")
     } catch (error) {
       console.error(error)
@@ -65,6 +69,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error(error)
       set({ user: null, accessToken: null })
       toast.error("Lỗi xảy ra khi lấy dữ liệu người dùng")
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  refresh: async () => {
+    try {
+      set({ loading: true })
+      const { user, fetchMe, setAccessToken } = get()
+      const accessToken = await authService.refresh()
+      setAccessToken(accessToken)
+
+      if (!user) {
+        await fetchMe()
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!")
+      get().clearState()
     } finally {
       set({ loading: false })
     }
