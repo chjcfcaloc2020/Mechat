@@ -30,7 +30,7 @@ export const signUp = async (req, res) => {
       username,
       hashPassword,
       email,
-      displayName: `${firstName} ${lastName}`
+      displayName: `${lastName} ${firstName}`
     })
 
     return res.sendStatus(204)
@@ -82,7 +82,7 @@ export const signIn = async (req, res) => {
 
     return res.status(200).json({ message: `User ${user.displayName} logged in!`, accessToken })
   } catch (error) {
-    console.error('SignUp error', error)
+    console.error('SignIn error', error)
     return res.status(500).json({ message: "System error" })
   }
 }
@@ -98,7 +98,7 @@ export const signOut = async (req, res) => {
 
     return res.sendStatus(204)
   } catch (error) {
-    console.error('SignUp error', error)
+    console.error('SignOut error', error)
     return res.status(500).json({ message: "System error" })
   }
 }
